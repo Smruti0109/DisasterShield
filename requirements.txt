@@ -1,0 +1,7 @@
+geopy==2.4.1
+pandas==2.2.2
+requests==2.32.3
+requests-cache==1.2.1
+requests-oauthlib==2.0.0
+streamlit==1.38.0
+streamlit_folium==0.24.0
