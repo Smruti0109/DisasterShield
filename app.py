@@ -18,20 +18,11 @@ if "disaster_type" not in st.session_state:
     st.session_state["disaster_type"] = None
 if "current_stock" not in st.session_state:
     st.session_state["current_stock"] = None
-
-# Predefined stock locations
-stock_locations = [
-    {"name": "Delhi", "coords": (28.7041, 77.1025), "resources": {"Food": 500, "Water": 1000, "Medical Kits": 300}},
-    {"name": "Mumbai", "coords": (19.0760, 72.8777), "resources": {"Food": 700, "Water": 1200, "Medical Kits": 400}},
-    {"name": "Chennai", "coords": (13.0827, 80.2707), "resources": {"Food": 450, "Water": 900, "Medical Kits": 200}},
-    {"name": "Kolkata", "coords": (22.5726, 88.3639), "resources": {"Food": 600, "Water": 1100, "Medical Kits": 350}},
-]
     
 import requests
 
 def predict_flood(inputs):
-    # IBM Watson API key and token generation
-    API_KEY = "6Xn172yJS_RFEjKrcHtnWVs068PNUaD8DudXJsygGnKy"
+    API_KEY = "IBM Watson API"
     token_response = requests.post(
         'https://iam.cloud.ibm.com/identity/token', 
         data={"apikey": API_KEY, "grant_type": 'urn:ibm:params:oauth:grant-type:apikey'}
@@ -57,7 +48,7 @@ def predict_flood(inputs):
 
     # Send the request to the flood prediction model endpoint
     response_scoring = requests.post(
-        'https://eu-de.ml.cloud.ibm.com/ml/v4/deployments/daef3e7c-b45d-4a53-8b67-b770b9fcfb5c/predictions?version=2021-05-01', 
+        'PUBLIC_ENDPOINT', 
         json=payload_scoring, 
         headers=header
     )
@@ -75,7 +66,7 @@ def predict_flood(inputs):
 
 def predict_earthquake(inputs):
     # IBM Watson API key and token generation
-    API_KEY = "FBNjCGhsBtbCCPXI1MqY-8U-BpNThG1km0X7IMuFIoEI"
+    API_KEY = "IBM Watson API"
     token_response = requests.post(
         'https://iam.cloud.ibm.com/identity/token', 
         data={"apikey": API_KEY, "grant_type": 'urn:ibm:params:oauth:grant-type:apikey'}
@@ -97,7 +88,7 @@ def predict_earthquake(inputs):
 
     # Send the request to the earthquake prediction model endpoint
     response_scoring = requests.post(
-        'https://eu-de.ml.cloud.ibm.com/ml/v4/deployments/43b00c89-a1b1-4a59-aa41-77fec2e87d31/predictions?version=2021-05-01', 
+        'PUBLIC_ENDPOINT', 
         json=payload_scoring, 
         headers=header
     )
@@ -119,7 +110,7 @@ def predict_earthquake(inputs):
 def get_earthquake_category(magnitude):
     """Classify earthquake magnitude into categories."""
     try:
-        magnitude = float(magnitude)  # Ensure magnitude is a float
+        magnitude = float(magnitude)  
     except (ValueError, TypeError):
         return "Invalid magnitude value"
 
@@ -185,8 +176,8 @@ elif menu == "Disaster Monitoring & Prediction":
                 "Water Level (m)": water_level,
                 "Historical Floods": historical_floods
             }
-            st.session_state["lat"] = lat  # Store latitude in session state
-            st.session_state["lon"] = lon  # Store longitude in session state
+            st.session_state["lat"] = lat  
+            st.session_state["lon"] = lon  
             flood_result = predict_flood(inputs)
             st.markdown(f"*Flood Prediction Result:*\n- Flood Occurred: {flood_result}")
 
@@ -222,7 +213,7 @@ elif menu == "Resource Tracking":
     st.subheader("🚚 Resource Tracking")
     
     # Load the resources.csv file
-    resources_file = "C:\\Users\\SMRUTI DESHPANDE\\Downloads\\disaster_relief\\disaster_relief\\resources_data.csv"
+    resources_file = "resources_data.csv"
     resources_df = pd.read_csv(resources_file)
     
     # Check for missing or invalid data
