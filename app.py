@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import pandas as pd
 import folium
+import requests
 from geopy.distance import geodesic
 from streamlit_folium import st_folium
 import json
@@ -18,8 +19,14 @@ if "disaster_type" not in st.session_state:
     st.session_state["disaster_type"] = None
 if "current_stock" not in st.session_state:
     st.session_state["current_stock"] = None
-    
-import requests
+
+# Predefined stock locations
+stock_locations = [
+    {"name": "Delhi", "coords": (28.7041, 77.1025), "resources": {"Food": 500, "Water": 1000, "Medical Kits": 300}},
+    {"name": "Mumbai", "coords": (19.0760, 72.8777), "resources": {"Food": 700, "Water": 1200, "Medical Kits": 400}},
+    {"name": "Chennai", "coords": (13.0827, 80.2707), "resources": {"Food": 450, "Water": 900, "Medical Kits": 200}},
+    {"name": "Kolkata", "coords": (22.5726, 88.3639), "resources": {"Food": 600, "Water": 1100, "Medical Kits": 350}},
+]
 
 def predict_flood(inputs):
     API_KEY = "IBM Watson API"
@@ -128,16 +135,89 @@ def get_earthquake_category(magnitude):
         return "Great Earthquake"
     else:
         return "Massive Earthquake"
+
+# Function to set custom background with revolving Earth
+def set_background():
+    background_style = """
+    <style>
+    .stApp {
+        background: radial-gradient(circle at center, #0d1117, #0d1117);
+        color: white;
+        font-family: 'Arial', sans-serif;
+        position: relative;
+        overflow: hidden;
+        min-height: 100vh;
+    }
+    .earth {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 500px;
+        height: 500px;
+        background: url('https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg') no-repeat center;
+        background-size: cover;
+        border-radius: 50%;
+        animation: spin 20s linear infinite;
+        box-shadow: 0 0 50px rgba(255, 255, 255, 0.5);
+    }
+    @keyframes spin {
+        from { transform: translate(-50%, -50%) rotate(0deg); }
+        to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
     
-# Function to find the closest stock location
-def find_closest_stock(lat, lon):
-    current_location = (lat, lon)
-    closest_location = min(stock_locations, key=lambda loc: geodesic(current_location, loc["coords"]).km)
-    return closest_location
+    .sidebar .sidebar-content {
+        background: linear-gradient(to bottom, #3a3a3a, #6a11cb);
+        color: white;
+    }
+    .stButton > button {
+        background: linear-gradient(to right, #43cea2, #185a9d);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 18px;
+        padding: 10px 20px;
+        transition: transform 0.2s;
+    }
+    .stButton > button:hover {
+        transform: scale(1.1);
+        background: linear-gradient(to right, #185a9d, #43cea2);
+    }
+    .stDropdown {
+        background: linear-gradient(to bottom right, #ffffff, #e0e0e0);
+        border-radius: 5px;
+        font-size: 16px;
+    }
+    .square-box {
+        width: 300px;
+        height: 150px;
+        background-color: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #c9d1d9;
+        font-size: 16px;
+        margin: 20px;
+        text-align: center;
+        padding: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    </style>
+    <div class="earth"></div>
+    """
+    st.markdown(background_style, unsafe_allow_html=True)
+
+# Apply custom background
+set_background()
 
 # Streamlit Sidebar
 st.sidebar.title("Navigation")
-menu = st.sidebar.radio("Go to", ["Home", "Disaster Monitoring & Prediction", "Resource Tracking"])
+menu = st.sidebar.selectbox(
+    "Go to", ["Home", "Disaster Monitoring & Prediction", "Resource Tracking"],
+    format_func=lambda x: f"🌟 {x}"
+)
 
 # Main Dashboard
 st.title("🌍 DisasterShield: Disaster Relief System")
@@ -145,15 +225,30 @@ st.title("🌍 DisasterShield: Disaster Relief System")
 if menu == "Home":
     st.subheader("Welcome!")
     st.markdown("""
-        This dashboard helps optimize disaster relief efforts using real-time weather data and AI predictions.
+        DisasterShield is an disaster relief system designed to optimize disaster response efforts. It leverages predictive analytics, and resource tracking to provide actionable insights for disaster management.
         Explore:
         - *Disaster Monitoring & Prediction*: Track weather conditions and predict disaster impacts.
         - *Resource Tracking*: Monitor and optimize resource allocation.
     """)
 
+    # Corrected Code
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("<h3 style='text-align: center;'>Flood Statistics</h3>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center;'>Monitor rainfall data and assess flood risks.</p>", unsafe_allow_html=True)
+        flood_image = Image.open("C:\\Users\\Pratiksha\\Documents\\VScode\\disaster_relief\\india-flood-prone-areas-map-2021.jpg")  # Replace with your actual path
+        st.image(flood_image, caption="Flood Monitoring", use_container_width=True)
+    with col2:
+        st.markdown("<h3 style='text-align: center;'>Earthquake Statistics</h3>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center;'>Track seismic activity and evaluate earthquake impacts.</p>", unsafe_allow_html=True)
+        earthquake_image = Image.open("C:\\Users\\Pratiksha\\Documents\\VScode\\disaster_relief\\Seismic-Map-of-India.png")  # Replace with your actual path
+        st.image(earthquake_image, caption="Earthquake Monitoring", use_container_width=True)
+
+
 elif menu == "Disaster Monitoring & Prediction":
     st.subheader("🌦 Disaster Monitoring & AI Predictions")
-
     # Disaster type selection
     disaster_type = st.selectbox("Select Disaster Type", DISASTER_TYPES)
     st.session_state["disaster_type"] = disaster_type
@@ -176,8 +271,8 @@ elif menu == "Disaster Monitoring & Prediction":
                 "Water Level (m)": water_level,
                 "Historical Floods": historical_floods
             }
-            st.session_state["lat"] = lat  
-            st.session_state["lon"] = lon  
+            st.session_state["lat"] = lat  # Store latitude in session state
+            st.session_state["lon"] = lon  # Store longitude in session state
             flood_result = predict_flood(inputs)
             st.markdown(f"*Flood Prediction Result:*\n- Flood Occurred: {flood_result}")
 
@@ -211,9 +306,23 @@ elif menu == "Disaster Monitoring & Prediction":
 
 elif menu == "Resource Tracking":
     st.subheader("🚚 Resource Tracking")
+
+    st.markdown(
+        """
+        <style>
+        .large-font {
+            font-size:20px !important;
+        }
+        .medium-font {
+            font-size:18px !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
     
     # Load the resources.csv file
-    resources_file = "resources_data.csv"
+    resources_file = "C:\\Users\\Pratiksha\\Documents\\VScode\\disaster_relief\\resources_data.csv"
     resources_df = pd.read_csv(resources_file)
     
     # Check for missing or invalid data
@@ -233,41 +342,46 @@ elif menu == "Resource Tracking":
                 )
                 closest_stock = resources_df.loc[resources_df['Distance'].idxmin()]
                 
-                st.markdown(f"Closest Stock Location (lat: {closest_stock['Latitude']}, lon: {closest_stock['longitude']}):")
+                # Ask if the user wants to allocate resources (default set to "No")
+                allocate = st.radio("Do you want to allocate resources?", ("Yes", "No"), index=1)
                 
-                # Display available resources
+                # Display available resources table
+                st.markdown(f"Closest Stock Location (lat: {closest_stock['Latitude']}, lon: {closest_stock['longitude']}):")
                 st.markdown("### Available Resources")
-                stock_info = closest_stock[["food and water", "clothing", "shelter", "medical suppliers"]]
+                stock_info = closest_stock[["Food And Water", "Clothing", "Shelter", "Medical Suppliers"]]
                 stock_df = pd.DataFrame(stock_info).reset_index()
                 stock_df.columns = ["Resource", "Available Quantity"]
                 st.table(stock_df)
                 
-                # Allocate resources
-                st.markdown("### Allocate Resources")
-                allocations = {}
-                for resource in stock_info.index:
-                    allocations[resource] = st.number_input(
-                        f"Allocate {resource.replace('_', ' ').capitalize()}",
-                        min_value=0, max_value=int(stock_info[resource]), step=1
-                    )
-                
-                if st.button("Update Stock After Allocation"):
-                    # Update the resources in the DataFrame
-                    for resource, allocated_quantity in allocations.items():
-                        closest_stock[resource] -= allocated_quantity
+                if allocate == "Yes":
+                    # Help allocate resources
+                    st.markdown("### Allocate Resources")
+                    allocations = {}
+                    for resource in stock_info.index:
+                        allocations[resource] = st.number_input(
+                            f"Allocate {resource.replace('_', ' ').capitalize()}",
+                            min_value=0, max_value=int(stock_info[resource]), step=1
+                        )
                     
-                    # Save the updated data back to CSV
-                    resources_df.loc[resources_df['Distance'].idxmin()] = closest_stock
-                    resources_df.drop(columns=["Distance"], inplace=True)  # Clean up before saving
-                    resources_df.to_csv(resources_file, index=False)
-                    
-                    st.success("Stock updated successfully!")
-                    
-                    # Display updated stock
-                    updated_stock_info = closest_stock[["food and water", "clothing", "shelter", "medical suppliers"]]
-                    updated_stock_df = pd.DataFrame(updated_stock_info).reset_index()
-                    updated_stock_df.columns = ["Resource", "Remaining Quantity"]
-                    st.markdown("### Updated Stock Levels")
-                    st.table(updated_stock_df)
+                    if st.button("Update Stock After Allocation"):
+                        # Update the resources in the DataFrame
+                        for resource, allocated_quantity in allocations.items():
+                            closest_stock[resource] -= allocated_quantity
+                        
+                        # Save the updated data back to CSV
+                        resources_df.loc[resources_df['Distance'].idxmin()] = closest_stock
+                        resources_df.drop(columns=["Distance"], inplace=True)  # Clean up before saving
+                        resources_df.to_csv(resources_file, index=False)
+                        
+                        st.success("Stock updated successfully!")
+                        
+                        # Display updated stock
+                        updated_stock_info = closest_stock[["Food And Water", "Clothing", "Shelter", "Medical Suppliers"]]
+                        updated_stock_df = pd.DataFrame(updated_stock_info).reset_index()
+                        updated_stock_df.columns = ["Resource", "Remaining Quantity"]
+                        st.markdown("### Updated Stock Levels")
+                        st.table(updated_stock_df)
+                else:
+                    st.info("You chose not to allocate resources. The available resources are displayed above.")
         else:
             st.warning("Please enter latitude and longitude in the Disaster Monitoring tab first.")
