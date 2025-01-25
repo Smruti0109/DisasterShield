@@ -53,6 +53,9 @@ DisasterShield is an disaster relief system designed to optimize disaster respon
 - **Cloud Platform**: IBM Cloud – For real-time resource tracking and data integration.
 - **ML Model**: Snap Logistic Regression for flood prediction based on parameters like rainfall, river discharge, and water levels. Snap Random Forest for earthquake magnitude prediction using parameters such as latitude, longitude, and depth.
 
+## Application Video:-
+  https://drive.google.com/file/d/1SvQ5Qlr6eIuk2PBFYPB77UuzGdL_Padt/view?usp=sharing
+
 ## Acknowledgements
 
 - Watsonx AutoAI for simplifying model development with automated training and deployment.
