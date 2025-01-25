@@ -35,7 +35,17 @@ DisasterShield is an disaster relief system designed to optimize disaster respon
 3. **Run the application:**
    ```bash
    streamlit run app.py
-   
+
+## Contribution
+
+- **Team Members**  
+   - Pratiksha Ashok Mohite
+   - Smruti Shripad Deshpande
+     
+- **Mentors**  
+   - Dr. Puja Padiya
+   - Mr. Yogesh Raje
+     
 ## Technical Stack
 
 - **Backend Framework**: Watsonx AutoAI – For automated machine learning model generation and training.
